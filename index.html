@@ -11,6 +11,9 @@
             background-color: #f4f4f4;
             margin: 0;
             padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
         .container {
@@ -21,7 +24,7 @@
         }
 
         .header {
-            background-color: #333;
+            background: linear-gradient(to bottom, #007BFF, #55a9ff); /* Lighter blue gradient for the header */
             color: #fff;
             padding: 20px;
         }
@@ -31,6 +34,7 @@
         }
 
         .content {
+            flex: 1;
             padding: 20px;
         }
 
@@ -40,10 +44,12 @@
         }
 
         .footer {
-            background-color: #333;
+            background: linear-gradient(to bottom, #007BFF, #55a9ff); /* Lighter blue gradient for the footer */
             color: #fff;
             text-align: center;
             padding: 10px 0;
+            position: sticky;
+            bottom: 0;
         }
     </style>
 </head>
