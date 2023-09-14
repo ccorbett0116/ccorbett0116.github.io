@@ -41,11 +41,14 @@
     .time-cell {
       font-weight: bold;
     }
+    .title {
+      text-align: center;
+    }
   </style>
 </head>
 <body>
 <div class="calendar">
-  <h1>24-Hour Weekly Calendar</h1>
+  <h1 class="title">24-Hour Weekly Calendar</h1>
   <table>
     <thead>
     <tr>
@@ -563,5 +566,13 @@
   for (let i = 0; i < 7; i++) {
     document.getElementById(daysOfWeek[i].toLowerCase()).textContent = getCurrentDate(i);
   }
+  var password;
+  function passwordCheck() {
+      while (password !== "123") {
+        password = prompt("Please enter the password.");
+      }
+    document.getElementsByClassName("title")[0].style.color="blue";
+  }
+  window.onload=passwordCheck;
 </script>
 </html>

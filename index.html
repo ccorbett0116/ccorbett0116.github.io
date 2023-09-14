@@ -71,7 +71,8 @@
 </div>
 <div class="footer">
     <div class="container">
-        <button onclick="makeCall()">test</button>
+        <button onclick="makeCall()">test get method 1</button>
+        <button onclick="makeCall2()">test get method 2</button>
         <p>&copy; 2023 Cole Corbett. All rights reserved.</p>
     </div>
 </div>
@@ -84,7 +85,15 @@
             success: function(res) {
                 alert(res);
             }
-        });
-    }
+        });}
+
+        function  makeCall2(){
+            $.ajax({
+                url: "http://nodejs-production-d97d.up.railway.app/two",
+                type: 'GET',
+                success: function(res) {
+                    alert(res);
+                }
+            });}
 </script>
 </html>
