@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cole Corbett - Personal Website</title>
@@ -69,8 +70,20 @@
 </div>
 <div class="footer">
     <div class="container">
+        <button onclick="makeCall()">test</button>
         <p>&copy; 2023 Cole Corbett. All rights reserved.</p>
     </div>
 </div>
 </body>
+<script>
+    function  makeCall(){
+        $.ajax({
+            url: "http://nodejs-production-d97d.up.railway.app",
+            type: 'GET',
+            success: function(res) {
+                alert(res);
+            }
+        });
+    }
+</script>
 </html>
