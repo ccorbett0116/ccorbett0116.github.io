@@ -2,6 +2,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>24-Hour Weekly Calendar</title>
@@ -13,15 +15,23 @@
       margin: 0;
       padding: 0;
     }
-    .calendar {
-      max-width: 800px;
+    .calendar-container {
+      max-width: 900px;
       margin: 0 auto;
       padding: 20px;
       background-color: #fff;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      overflow: auto; /* Add overflow property to contain floated elements */
+    }
+    .calendar {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      background: transparent;
     }
     table {
       width: 100%;
+      background: transparent;
       border-collapse: collapse;
     }
     th, td {
@@ -45,10 +55,51 @@
     .title {
       text-align: center;
     }
+    .insert-section {
+      text-align: center;
+      width: 50%;
+      padding: 15px; /* Add padding to the insert section */
+      padding-left: 0px;
+      margin-left: 25%;
+    }
+
+    .insert-section label {
+      font-weight: bold;
+      display: block; /* Display the label as a block element to put it on top */
+      padding-bottom: 1em;
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr; /* Create a 2x2 grid */
+      gap: 5px; /* Add spacing between input fields */
+    }
+
+    .input-grid input {
+      margin: 5px;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+
+    .insert-section button {
+      margin-top: 1em;
+      padding: 5px 10px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .insert-section button:hover {
+      background-color: #0056b3;
+    }
   </style>
 </head>
 <body>
-<div class="calendar">
+<div class="calendar-container">
+  <div class="calendar">
   <h1 class="title">24-Hour Weekly Calendar</h1>
   <table>
     <thead>
@@ -546,6 +597,18 @@
     </tr>
     </tbody>
   </table>
+  </div>
+  <div class="insert-section">
+    <label >INSERT:</label>
+    <div class="input-grid">
+      <input type="text" id="date" placeholder="Date">
+      <!--<input type="date" id="event1" placeholder="Date">-->
+      <select id="start"></select>
+      <select id="end"></select>
+      <input type="text" id="description" placeholder="Description">
+    </div>
+    <button id="insertButton">Insert</button>
+  </div>
 </div>
 </body>
 <script>
@@ -579,5 +642,77 @@
       * */
   }
   window.onload=passwordCheck;
+
+  function populateStartDropdown() {
+    const dropdown = document.getElementById('start');
+
+    for (let hour = 0; hour <= 23; hour++) {
+      for (let minute = 0; minute <= 30; minute += 30) {
+        const formatted12Hour = format12Hour(hour, minute);
+        const formatted24Hour = format24Hour(hour, minute);
+
+        const option = document.createElement('option');
+        option.value = formatted24Hour; // Use 24-hour format for data
+        option.text = formatted12Hour; // Use 12-hour format for UI
+        dropdown.appendChild(option);
+      }
+    }
+  }
+  function populateEndDropdown() {
+    const dropdown = document.getElementById('end');
+
+    for (let hour = 0; hour <= 23; hour++) {
+      for (let minute = 0; minute <= 30; minute += 30) {
+        const formatted12Hour = format12Hour(hour, minute);
+        const formatted24Hour = format24Hour(hour, minute);
+
+        const option = document.createElement('option');
+        option.value = formatted24Hour; // Use 24-hour format for data
+        option.text = formatted12Hour; // Use 12-hour format for UI
+        dropdown.appendChild(option);
+      }
+    }
+  }
+
+  // Function to format time in 12-hour format (UI)
+  function format12Hour(hour, minute) {
+    const period = hour < 12 ? 'AM' : 'PM';
+    const formattedHour = hour % 12 || 12;
+    const formattedMinute = minute < 10 ? `0${minute}` : minute;
+    return `${formattedHour}:${formattedMinute} ${period}`;
+  }
+
+  // Function to format time in 24-hour format (data)
+  function format24Hour(hour, minute) {
+    const formattedHour = hour < 10 ? `0${hour}` : hour;
+    const formattedMinute = minute < 10 ? `0${minute}` : minute;
+    return `${formattedHour}${formattedMinute}`;
+  }
+
+  // Call the function to populate the time dropdown
+  populateStartDropdown();
+  populateEndDropdown();
+
+  $('#insertButton').click(function(){
+    $.ajax({
+      contentType: "application/json",
+      url: "http://nodejs-production-d97d.up.railway.app/insert",
+      type: 'POST',
+      data: JSON.stringify({
+        date : document.getElementById("date").value,
+        start : document.getElementById("start").value,
+        end : document.getElementById("end").value,
+        description : document.getElementById("end").value,
+        user : "Cole"
+      }),
+      success: function(data){
+        alert('Success!')
+      },
+      error: function(jqXHR, textStatus, err){
+        alert('text status '+textStatus+', err '+err)
+      }
+    });
+  });
+
 </script>
 </html>
