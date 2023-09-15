@@ -661,23 +661,19 @@
       console.log(startDate)
       startDate = startDate.substring(0, 10);
       console.log(startDate)
-      let endDate = new Date();
-      endDate.setDate(startDate.getDate() + 6); // Add 6 days to the start date
+      startDate=daysBetweenJanOne(startDate)
+      let endDate = startDate+6;
 
       // Convert start and end dates to ISO date strings
-      console.log(daysBetweenJanOne(startDate.toISOString().substring(0, 10)))
-      console.log(daysBetweenJanOne(endDate.toISOString().substring(0, 10)))
-      const startDateValue = daysBetweenJanOne(getDays(startDate.toISOString().substring(0, 10)));
-      const endDateValue = daysBetweenJanOne(getDays(endDate.toISOString().substring(0, 10)));
-      console.log(startDateValue);
-      console.log(endDateValue);
+      console.log(startDate)
+      console.log(endDate)
       const data = await $.ajax({
         contentType: "application/json",
         url: "http://nodejs-production-d97d.up.railway.app/getEventsRange",
         type: 'GET',
         data: {
-          startDate: startDateValue,
-          endDate: endDateValue,
+          startDate: startDate,
+          endDate: endDate,
           user: "Cole"
         }
       });
@@ -729,12 +725,13 @@
     }
   }
 
-  //a function to calculate days between two dates
-
-
+  //a function to calculate days between a date and January 1 2023, the input string is formated as yyyy-mm-dd
     function daysBetween(date) {
-        var firstDate = getDays(new Date().toISOString().substring(0, 10));
-        return date - firstDate;
+        var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
+        var firstDate = new Date(2023,0,1);
+        var secondDate = new Date(date);
+        var diffDays = Math.round(Math.abs((secondDate.getTime() - firstDate.getTime())/(oneDay)));
+        return diffDays;
     }
 
   function populateStartDropdown() {
