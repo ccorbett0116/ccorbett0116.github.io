@@ -706,10 +706,10 @@
         user : "Cole"
       }),
       success: function(data){
-        alert('Success!')
+        alert(data)
       },
-      error: function(jqXHR, textStatus, err){
-        alert('text status '+textStatus+', err '+err)
+      error: function(err){
+        alert(err)
       }
     });
   });
