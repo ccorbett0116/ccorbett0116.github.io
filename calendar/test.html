@@ -2,8 +2,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>24-Hour Weekly Calendar</title>
@@ -702,17 +702,16 @@
         date : document.getElementById("date").value,
         start : document.getElementById("start").value,
         end : document.getElementById("end").value,
-        description : document.getElementById("end").value,
+        description : document.getElementById("description").value,
         user : "Cole"
       }),
       success: function(data){
-        alert(data)
+        alert(data.message)
       },
       error: function(err){
-        alert(err)
+        alert(err.message)
       }
     });
   });
-
 </script>
 </html>
