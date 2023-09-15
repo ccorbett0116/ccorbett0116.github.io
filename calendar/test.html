@@ -645,52 +645,96 @@
   }
   window.onload=passwordCheck;*/
 
+  function daysBetweenJanOne(date) {
+    var firstDate = new Date(2023, 0, 1).toISOString().substring(0, 10);
+    var secondDate = new Date(date).toISOString().substring(0, 10);
+    return secondDate - firstDate;
+  }
+
   //Function to query database for events for a given day and the next 6 days
   async function onLoad() {
     try {
-      // Set curDate to the current date in the format of yyyy-mm-dd
-      var curDate = getDays(new Date().toISOString().substring(0, 10));
+      // Calculate the start date and end date for the 7-day range
+      let startDate = new Date();
+      console.log(startDate)
+      startDate = startDate.toISOString()
+      console.log(startDate)
+      startDate = startDate.substring(0, 10);
+      console.log(startDate)
+      let endDate = new Date();
+      endDate.setDate(startDate.getDate() + 6); // Add 6 days to the start date
+
+      // Convert start and end dates to ISO date strings
+      console.log(daysBetweenJanOne(startDate.toISOString().substring(0, 10)))
+      console.log(daysBetweenJanOne(endDate.toISOString().substring(0, 10)))
+      const startDateValue = daysBetweenJanOne(getDays(startDate.toISOString().substring(0, 10)));
+      const endDateValue = daysBetweenJanOne(getDays(endDate.toISOString().substring(0, 10)));
+      console.log(startDateValue);
+      console.log(endDateValue);
       const data = await $.ajax({
         contentType: "application/json",
-        url: "http://nodejs-production-d97d.up.railway.app/getEvents",
+        url: "http://nodejs-production-d97d.up.railway.app/getEventsRange",
         type: 'GET',
         data: {
-          date: curDate,
+          startDate: startDateValue,
+          endDate: endDateValue,
           user: "Cole"
         }
       });
+
       var events = data.events;
-      // Code here will execute after the AJAX call is complete
-      for (let i = 0; i < events.length; i++) {
-        //assume today is day0, colour each <td> with a matching day and time class to blue note: events[i].date is the number of days from Jan 1, 2023
-        var day = daysBetween(events[i].date);
-        var user = events[i].user;
-        var time = events[i].time.toString();
-        var dayClass = "day" + day;
-        var timeClass;
-        //time may be formaated as 0, or 30, or 130, ect. need to format to 0000, 0030, 0130, ect.
-        if (time.length === 1) {
-          timeClass = "000" + time;
-        } else if (time.length === 2) {
-          timeClass = "00" + time;
-        } else if (time.length === 3) {
-          timeClass = "0" + time;
-        } else {
-        timeClass = time;
-        //fill in cells with matching day and time class with blue
+
+      if (events && Array.isArray(events)) {
+        // Iterate over the 7 days
+        for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
+          const currentDate = new Date(startDate);
+          currentDate.setDate(currentDate.getDate() + dayOffset);
+
+          // Filter events for the current day
+          const eventsForCurrentDay = events.filter(event => {
+            const eventDate = new Date(event.date);
+            return eventDate.toISOString().substring(0, 10) === currentDate.toISOString().substring(0, 10);
+          });
+
+          // Display events for the current day
+          eventsForCurrentDay.forEach(event => {
+            var day = daysBetween(event.date);
+            var user = event.user;
+            var time = event.time.toString();
+            var dayClass = "day" + day;
+            var timeClass;
+            if (time.length === 1) {
+              timeClass = "000" + time;
+            } else if (time.length === 2) {
+              timeClass = "00" + time;
+            } else if (time.length === 3) {
+              timeClass = "0" + time;
+            } else {
+              timeClass = time;
+            }
+            var classString = timeClass + " " + dayClass;
+
+            // Change the background color of <td> elements with the classString to blue
+            var elements = document.getElementsByClassName(classString);
+            for (let i = 0; i < elements.length; i++) {
+              elements[i].style.backgroundColor = "blue";
+            }
+          });
         }
-        var classString = timeClass + " " + dayClass;
-        document.getElementsByClassName(classString)[0].style.backgroundColor = "blue";
+      } else {
+        console.log("No events data received.");
       }
     } catch (err) {
       alert(err.message);
     }
-
   }
+
   //a function to calculate days between two dates
+
+
     function daysBetween(date) {
         var firstDate = getDays(new Date().toISOString().substring(0, 10));
-        return firstDate - date;
+        return date - firstDate;
     }
 
   function populateStartDropdown() {
