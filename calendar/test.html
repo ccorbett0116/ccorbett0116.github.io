@@ -56,31 +56,78 @@
     }
     .insert-section {
       text-align: center;
-      width: 50%;
-      padding: 15px; /* Add padding to the insert section */
+      width: 45%;
+
       padding-left: 0;
-      margin-left: 25%;
+      float: left;
     }
+
+    .recurring-container label {
+        font-weight: bold;
+        display: block; /* Display the label as a block element to put it on top */
+    }
+    .recurring-container{
+      height: auto;
+      width: 45%;
+      padding-right: 2.5%;
+      float: right;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+      grid-template-rows: 1fr 0.5fr 0.7fr 1fr;
+      gap: 0 0;
+      grid-template-areas:
+    "Recurring-Label Recurring-Label Recurring-Button . Description Description Description"
+    "Sun Mon Tues Wed Thurs Fri Sat"
+    "sunLabel monLabel tueLabel wedLabel thurLabel friLabel satLabel"
+    "StartLabel Beginning-Date Beginning-Date . EndLabel Ending-Date Ending-Date";
+    }
+    .Recurring-Label { grid-area: Recurring-Label; }
+    .Recurring-Button { grid-area: Recurring-Button; }
+    .Description { grid-area: Description; }
+    .Sun { grid-area: Sun; }
+    .Mon { grid-area: Mon; }
+    .Tues { grid-area: Tues; }
+    .Wed { grid-area: Wed; }
+    .Thurs { grid-area: Thurs; }
+    .Fri { grid-area: Fri; }
+    .Sat { grid-area: Sat; }
+    .sunLabel { grid-area: sunLabel; }
+    .monLabel { grid-area: monLabel; }
+    .tueLabel { grid-area: tueLabel; }
+    .wedLabel { grid-area: wedLabel; }
+    .thurLabel { grid-area: thurLabel; }
+    .friLabel { grid-area: friLabel; }
+    .satLabel { grid-area: satLabel; }
+    .Beginning-Date { grid-area: Beginning-Date;}
+    .StartLabel { grid-area: StartLabel; }
+    .EndLabel { grid-area: EndLabel; }
+    .Ending-Date { grid-area: Ending-Date; }
+
 
     .insert-section label {
       font-weight: bold;
       display: block; /* Display the label as a block element to put it on top */
       padding-bottom: 1em;
+    }.recurring-section label {
+      font-weight: bold;
+      display: block; /* Display the label as a block element to put it on top */
+      padding-bottom: 1em;
     }
-
+     .fifteen{
+       padding-top: 10%;
+       padding-bottom: 10%;
+     }
     .input-grid {
       display: grid;
       grid-template-columns: 1fr 1fr; /* Create a 2x2 grid */
       gap: 5px; /* Add spacing between input fields */
     }
-
     .input-grid input {
       margin: 5px;
       padding: 5px;
       border: 1px solid #ccc;
       border-radius: 3px;
     }
-
     .insert-section button {
       margin-top: 1em;
       padding: 5px 10px;
@@ -90,9 +137,29 @@
       border-radius: 3px;
       cursor: pointer;
     }
-
     .insert-section button:hover {
       background-color: #0056b3;
+    }
+
+    /* Media Queries */
+    @media (max-width: 768px) {
+      .calendar-container {
+        padding: 10px;
+      }
+      .calendar {
+        padding: 10px;
+      }
+      .insert-section {
+        width: 100%;
+        margin-left: 0;
+      }
+      .recurring-container {
+        width: 100%;
+        margin-left: 15%;
+      }
+      .shift{
+        padding-left: 10%;
+      }
     }
   </style>
 </head>
@@ -607,6 +674,98 @@
     </div>
     <button id="insertButton">Insert</button>
   </div>
+  <div class="recurring-container">
+    <div class="Recurring-Label fifteen shift" style="display: flex; align-items: center; justify-content: center">
+      <label>RECURRING?</label>
+    </div>
+    <div class="Recurring-Button fifteen shift" style="align-items: center; display: flex; justify-content: right;">
+        <input type="checkbox" id="recurring" name="recurring" value="recurring" style="float:right;">
+    </div>
+    <div class="Description fifteen shift">
+      <input type="text" id="description2" placeholder="Description">
+    </div>
+    <div class="Sun fifteen shift">
+      <!--Add a check box inside each of the days of the week -->
+        <input type="checkbox" id="sunday2" name="sunday2" value="sunday2">
+    </div>
+    <div class="Mon fifteen shift">
+        <input type="checkbox" id="monday2" name="monday2" value="monday2">
+    </div>
+    <div class="Tues fifteen shift">
+        <input type="checkbox" id="tuesday2" name="tuesday2" value="tuesday2">
+    </div>
+    <div class="Wed fifteen shift">
+        <input type="checkbox" id="wednesday2" name="wednesday2" value="wednesday2">
+    </div>
+    <div class="Thurs fifteen shift">
+        <input type="checkbox" id="thursday2" name="thursday2" value="thursday2">
+    </div>
+    <div class="Fri fifteen shift">
+        <input type="checkbox" id="friday2" name="friday2" value="friday2">
+    </div>
+    <div class="Sat fifteen shift">
+        <input type="checkbox" id="saturday2" name="saturday2" value="saturday2">
+    </div>
+    <div class="sunLabel shift">
+        <label>S</label>
+    </div>
+    <div class="monLabel shift">
+        <label>M</label>
+    </div>
+    <div class="tueLabel shift">
+        <label>T</label>
+    </div>
+    <div class="wedLabel shift">
+        <label>W</label>
+    </div>
+    <div class="thurLabel shift">
+        <label>T</label>
+    </div>
+    <div class="friLabel shift">
+        <label>F</label>
+    </div>
+    <div class="satLabel shift">
+        <label>S</label>
+    </div>
+    <div class="StartLabel fifteen shift">
+        <label>Start Date:</label>
+    </div>
+    <div class="Beginning-Date fifteen shift">
+      <input id="start2" type="date"></input>
+    </div>
+    <div class="EndLabel fifteen shift">
+        <label>End Date:</label>
+    </div>
+    <div class="Ending-Date fifteen shift">
+      <input id="end2" type="date"></input>
+    </div>
+  </div>
+  <!--<div class="recurring-section">
+    <label>RECURRING?</label>
+    <div class="input-grid">
+      add a checkbox beside the curring label. when checked the user should be able to check up to 7 checkboxes representing days of the week, and enter a start and end date as well as times and descriptions
+        <input type="checkbox" id="recurring" name="recurring" value="recurring">
+
+    </div>
+  </div>
+
+  <div class="recurring-container">
+  <div class="Tues"></div>
+  <div class="Sun"></div>
+  <div class="Mon"></div>
+  <div class="Wed"></div>
+  <div class="Thurs"></div>
+  <div class="Fri"></div>
+  <div class="Sat"></div>
+  <div class="Recurring-Button"></div>
+  <div class="Description"></div>
+  <div class="Beginning-Date"></div>
+  <div class="Ending-Date"></div>
+  <div class="EndLabel"></div>
+  <div class="StartLabel"></div>
+</div>
+
+  -->
 </div>
 </body>
 <script>
