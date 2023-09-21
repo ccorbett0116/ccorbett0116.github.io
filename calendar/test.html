@@ -73,13 +73,14 @@
       float: right;
       display: grid;
       grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-      grid-template-rows: 1fr 0.5fr 0.7fr 1fr;
+      grid-template-rows: 1fr 0.5fr 0.7fr 1fr 1fr;
       gap: 0 0;
       grid-template-areas:
     "Recurring-Label Recurring-Label Recurring-Button . Description Description Description"
     "Sun Mon Tues Wed Thurs Fri Sat"
     "sunLabel monLabel tueLabel wedLabel thurLabel friLabel satLabel"
-    "StartLabel Beginning-Date Beginning-Date . EndLabel Ending-Date Ending-Date";
+    "StartLabel Beginning-Date Beginning-Date . EndLabel Ending-Date Ending-Date"
+    "startTimeLabel startTime startTime . endTimeLabel endTime endTime";
     }
     .Recurring-Label { grid-area: Recurring-Label; }
     .Recurring-Button { grid-area: Recurring-Button; }
@@ -102,6 +103,10 @@
     .StartLabel { grid-area: StartLabel; }
     .EndLabel { grid-area: EndLabel; }
     .Ending-Date { grid-area: Ending-Date; }
+    .startTimeLabel { grid-area: startTimeLabel; }
+    .startTime { grid-area: startTime; }
+    .endTimeLabel { grid-area: endTimeLabel; }
+    .endTime { grid-area: endTime; }
 
 
     .insert-section label {
@@ -739,6 +744,18 @@
     <div class="Ending-Date fifteen shift">
       <input id="end2" type="date"></input>
     </div>
+    <div class="startTimeLabel fifteen shift">
+        <label>Start Time:</label>
+    </div>
+    <div class="startTime fifteen shift">
+      <select id="startTime2"></select>
+    </div>
+    <div class="endTimeLabel fifteen shift">
+        <label>End Time:</label>
+    </div>
+    <div class="endTime fifteen shift">
+        <select id="endTime2"></select>
+    </div>
   </div>
   <!--<div class="recurring-section">
     <label>RECURRING?</label>
@@ -757,12 +774,24 @@
   <div class="Thurs"></div>
   <div class="Fri"></div>
   <div class="Sat"></div>
+  <div class="Recurring-Label"></div>
   <div class="Recurring-Button"></div>
   <div class="Description"></div>
   <div class="Beginning-Date"></div>
   <div class="Ending-Date"></div>
   <div class="EndLabel"></div>
   <div class="StartLabel"></div>
+  <div class="sunLabel"></div>
+  <div class="monLabel"></div>
+  <div class="tueLabel"></div>
+  <div class="wedLabel"></div>
+  <div class="thurLabel"></div>
+  <div class="friLabel"></div>
+  <div class="satLabel"></div>
+  <div class="startTimeLabel"></div>
+  <div class="startTime"></div>
+  <div class="endTimeLabel"></div>
+  <div class="endTime"></div>
 </div>
 
   -->
@@ -949,6 +978,7 @@
 
   function populateStartDropdown() {
     const dropdown = document.getElementById('start');
+    const rDropdown = document.getElementById('startTime2');
 
     for (let hour = 0; hour <= 23; hour++) {
       for (let minute = 0; minute <= 30; minute += 30) {
@@ -959,11 +989,16 @@
         option.value = formatted24Hour; // Use 24-hour format for data
         option.text = formatted12Hour; // Use 12-hour format for UI
         dropdown.appendChild(option);
+        const option2 = document.createElement('option');
+        option2.value = formatted24Hour; // Use 24-hour format for data
+        option2.text = formatted12Hour; // Use 12-hour format for UI
+        rDropdown.appendChild(option2);
       }
     }
   }
   function populateEndDropdown() {
     const dropdown = document.getElementById('end');
+    const rDropdown = document.getElementById('endTime2');
 
     for (let hour = 0; hour <= 23; hour++) {
       for (let minute = 0; minute <= 30; minute += 30) {
@@ -977,6 +1012,10 @@
         option.value = formatted24Hour; // Use 24-hour format for data
         option.text = formatted12Hour; // Use 12-hour format for UI
         dropdown.appendChild(option);
+        const option2 = document.createElement('option');
+        option2.value = formatted24Hour; // Use 24-hour format for data
+        option2.text = formatted12Hour; // Use 12-hour format for UI
+        rDropdown.appendChild(option2);
       }
     }
     const option = document.createElement('option');
