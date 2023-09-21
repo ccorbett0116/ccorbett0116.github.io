@@ -684,7 +684,7 @@
       <label>RECURRING?</label>
     </div>
     <div class="Recurring-Button fifteen shift" style="align-items: center; display: flex; justify-content: right;">
-        <input type="checkbox" id="recurring" name="recurring" value="recurring" style="float:right;">
+      <input type="checkbox" id="recurring" name="recurring" value="recurring">
     </div>
     <div class="Description fifteen shift">
       <input type="text" id="description2" placeholder="Description">
@@ -757,48 +757,9 @@
         <select id="endTime2"></select>
     </div>
   </div>
-  <!--<div class="recurring-section">
-    <label>RECURRING?</label>
-    <div class="input-grid">
-      add a checkbox beside the curring label. when checked the user should be able to check up to 7 checkboxes representing days of the week, and enter a start and end date as well as times and descriptions
-        <input type="checkbox" id="recurring" name="recurring" value="recurring">
-
-    </div>
-  </div>
-
-  <div class="recurring-container">
-  <div class="Tues"></div>
-  <div class="Sun"></div>
-  <div class="Mon"></div>
-  <div class="Wed"></div>
-  <div class="Thurs"></div>
-  <div class="Fri"></div>
-  <div class="Sat"></div>
-  <div class="Recurring-Label"></div>
-  <div class="Recurring-Button"></div>
-  <div class="Description"></div>
-  <div class="Beginning-Date"></div>
-  <div class="Ending-Date"></div>
-  <div class="EndLabel"></div>
-  <div class="StartLabel"></div>
-  <div class="sunLabel"></div>
-  <div class="monLabel"></div>
-  <div class="tueLabel"></div>
-  <div class="wedLabel"></div>
-  <div class="thurLabel"></div>
-  <div class="friLabel"></div>
-  <div class="satLabel"></div>
-  <div class="startTimeLabel"></div>
-  <div class="startTime"></div>
-  <div class="endTimeLabel"></div>
-  <div class="endTime"></div>
-</div>
-
-  -->
 </div>
 </body>
 <script>
-  //TODO: Onload, get table of events from database and populate table
   //TODO: Save which user is logged in, maybe a table for it? or just a variable if feeling lazy. prob session storage for user
 
   // Define the daysOfWeek and months arrays globally
@@ -819,82 +780,6 @@
   for (let i = 0; i < 7; i++) {
     document.getElementById(daysOfWeek[i].toLowerCase()).textContent = getCurrentDate(i);
   }
-  /*var password;
-  function passwordCheck() {
-      while (password !== "123") {
-        password = prompt("Please enter the password.");
-      }
-    document.getElementsByClassName("title")[0].style.color="blue";
-
-      * Run for loop for each date in week range grabbing all events of the day
-      * for each event returned, input into table
-      *
-  }
-  window.onload=passwordCheck;*/
-
-  function daysBetween(date) {
-    var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
-    var firstDate = new Date(2023,0,1);
-    var secondDate = new Date(date);
-    return Math.round(Math.abs((secondDate.getTime() - firstDate.getTime())/(oneDay)));
-  }
-  function delete2() {
-    var confirmDelete = confirm("Are you sure you want to delete this event?");
-    const populatedElements = document.getElementsByClassName("populated");
-    if (confirmDelete) {
-      var eventToDeleteDescription = this.innerHTML;
-      var promises = [];
-
-      for (let j = 0; j < populatedElements.length; j++) {
-        if (populatedElements[j].innerHTML === eventToDeleteDescription) {
-          populatedElements[j].innerHTML = "";
-            populatedElements[j].style.backgroundColor = "white";
-            populatedElements[j].classList.add("toRemove")
-          var eventToDeleteTime = populatedElements[j].classList[0];
-
-          // Create a promise for each AJAX call
-          var ajaxPromise = new Promise(function(resolve, reject) {
-            $.ajax({
-              contentType: "application/json",
-              url: "http://nodejs-production-d97d.up.railway.app/delete",
-              type: 'POST',
-              data: JSON.stringify({
-                time: eventToDeleteTime,
-                description: eventToDeleteDescription,
-                user: "Cole"
-              }),
-              success: function (data) {
-                console.log(data);
-                resolve(data); // Resolve the promise on success
-              },
-              error: function (err) {
-                reject(err); // Reject the promise on error
-              }
-            });
-          });
-
-          promises.push(ajaxPromise);
-        }
-      }
-      // Wait for all promises to be resolved
-      Promise.all(promises)
-              .then(function() {
-                // All AJAX calls were successful
-                var toRemoveElements = document.getElementsByClassName("toRemove");
-                for (let i = toRemoveElements.length-1; i > 0; i--) {
-                  toRemoveElements[i].classList.remove("toRemove");
-                  toRemoveElements[i].classList.remove("populated");
-                }
-                onLoad();
-              })
-              .catch(function(err) {
-                // Handle errors here if needed
-                console.error(err);
-                onLoad();
-              });
-    }
-  }
-
 
   //Function to query database for events for a given day and the next 6 days
   async function onLoad() {
@@ -918,7 +803,6 @@
       });
 
       var events = data.events;
-      console.log(events);
       //print all events returned
 
       if (events && Array.isArray(events)) {
@@ -975,6 +859,142 @@
       alert(err.message);
     }
   }
+  /*var password;
+  function passwordCheck() {
+      while (password !== "123") {
+        password = prompt("Please enter the password.");
+      }
+    document.getElementsByClassName("title")[0].style.color="blue";
+
+      * Run for loop for each date in week range grabbing all events of the day
+      * for each event returned, input into table
+      *
+  }
+  window.onload=passwordCheck;*/
+  // Get a reference to the recurringButton checkbox and the elements in the recurring-container
+  const recurringButton = document.getElementById("recurring");
+  const recurringContainerElements = document.querySelectorAll(".recurring-container input, .recurring-container select");
+  const insertSectionElements = document.querySelectorAll(".insert-section input, .insert-section select");
+
+  // Disable and grey out the elements inside the recurring-container
+  for (const element of recurringContainerElements) {
+    element.disabled = true;
+    element.style.opacity = 0.5; // You can adjust the opacity to your preference
+  }
+  document.getElementById("recurring").style.opacity = 1;
+  document.getElementById("recurring").disabled = false;
+
+
+  // Add an event listener to the recurringButton checkbox to handle enabling/disabling
+  recurringButton.addEventListener("change", function () {
+    // Enable or disable the recurring-container elements based on the checkbox state
+    const isEnabled = recurringButton.checked;
+
+    for (const element of recurringContainerElements) {
+      element.disabled = !isEnabled;
+      element.style.opacity = isEnabled ? 1 : 0.5; // Adjust opacity based on the checkbox state
+    }
+    for (const element of insertSectionElements) {
+      element.disabled = isEnabled;
+      element.style.opacity = isEnabled ? 0.5 : 1; // Adjust opacity based on the checkbox state
+      document.getElementById("insertButton").disabled = isEnabled;
+      document.getElementById("insertButton").style.opacity = isEnabled ? 0.5 : 1;
+      document.getElementById("insertButton").style.pointerEvents = isEnabled ? "none" : "auto";
+    }
+    document.getElementById("recurring").style.opacity = 1;
+    document.getElementById("recurring").disabled = false;
+  });
+
+
+
+  function daysBetween(date) {
+    var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
+    var firstDate = new Date(2023,0,1);
+    var secondDate = new Date(date);
+    return Math.round(Math.abs((secondDate.getTime() - firstDate.getTime())/(oneDay)));
+  }
+  function delete2() {
+    var confirmDelete = confirm("Are you sure you want to delete this event?");
+    const populatedElements = document.getElementsByClassName("populated");
+    if (confirmDelete) {
+      var eventToDeleteDescription = this.innerHTML;
+      var eventToDeleteDay=parseInt(this.classList[1].substring(3));
+      console.log(eventToDeleteDay + " is added");
+      //currentDay =
+      console.log(daysBetween(new Date)-1 + " is the current day")
+      eventToDeleteDay = daysBetween(new Date)-1 + eventToDeleteDay;
+      eventToDeleteDay = daysBetween(new Date)-1 + eventToDeleteDay;
+      console.log(eventToDeleteDay + " is the day");
+      var promises = [];
+
+      for (let j = 0; j < populatedElements.length; j++) {
+        if (populatedElements[j].innerHTML === eventToDeleteDescription) {
+          populatedElements[j].innerHTML = "";
+            populatedElements[j].style.backgroundColor = "";
+            populatedElements[j].classList.add("toRemove")
+          var eventToDeleteTime = populatedElements[j].classList[0];
+
+          // Create a promise for each AJAX call
+          var ajaxPromise = new Promise(function(resolve, reject) {
+            $.ajax({
+              contentType: "application/json",
+              url: "http://nodejs-production-d97d.up.railway.app/delete",
+              type: 'POST',
+              data: JSON.stringify({
+                time: eventToDeleteTime,
+                description: eventToDeleteDescription,
+                user: "Cole",
+                date: eventToDeleteDay
+              }),
+              success: function (data) {
+                console.log(data);
+                resolve(data); // Resolve the promise on success
+              },
+              error: function (err) {
+                reject(err); // Reject the promise on error
+              }
+            });
+          });
+
+          promises.push(ajaxPromise);
+        }
+      }
+      // Wait for all promises to be resolved
+      Promise.all(promises)
+              .then(function() {
+                // All AJAX calls were successful
+                var toRemoveElements = document.getElementsByClassName("toRemove");
+                for (let i = toRemoveElements.length-1; i >= 0; i--) {
+                    toRemoveElements[i].removeEventListener("click", delete2);
+                }
+                for (let i = toRemoveElements.length-1; i >= 0; i--) {
+                  toRemoveElements[i].classList.remove("populated");
+                  toRemoveElements[i].classList.remove("toRemove");
+                }
+                onLoad();
+              })
+              .catch(function(err) {
+                // Handle errors here if needed
+                console.error(err);
+                onLoad();
+              });
+    }
+  }
+
+  // Function to format time in 12-hour format (UI)
+  function format12Hour(hour, minute) {
+    const period = hour < 12 ? 'AM' : 'PM';
+    const formattedHour = hour % 12 || 12;
+    const formattedMinute = minute < 10 ? `0${minute}` : minute;
+    return `${formattedHour}:${formattedMinute} ${period}`;
+  }
+
+  // Function to format time in 24-hour format (data)
+  function format24Hour(hour, minute) {
+    const formattedHour = hour < 10 ? `0${hour}` : hour;
+    const formattedMinute = minute < 10 ? `0${minute}` : minute;
+    return `${formattedHour}${formattedMinute}`;
+  }
 
   function populateStartDropdown() {
     const dropdown = document.getElementById('start');
@@ -1002,7 +1022,7 @@
 
     for (let hour = 0; hour <= 23; hour++) {
       for (let minute = 0; minute <= 30; minute += 30) {
-        if(hour === 0 && minute === 0){
+        if (hour === 0 && minute === 0) {
           continue;
         }
         const formatted12Hour = format12Hour(hour, minute);
@@ -1022,21 +1042,10 @@
     option.value = "2400";
     option.text = "Midnight";
     dropdown.appendChild(option);
-  }
-
-  // Function to format time in 12-hour format (UI)
-  function format12Hour(hour, minute) {
-    const period = hour < 12 ? 'AM' : 'PM';
-    const formattedHour = hour % 12 || 12;
-    const formattedMinute = minute < 10 ? `0${minute}` : minute;
-    return `${formattedHour}:${formattedMinute} ${period}`;
-  }
-
-  // Function to format time in 24-hour format (data)
-  function format24Hour(hour, minute) {
-    const formattedHour = hour < 10 ? `0${hour}` : hour;
-    const formattedMinute = minute < 10 ? `0${minute}` : minute;
-    return `${formattedHour}${formattedMinute}`;
+    const option2 = document.createElement('option');
+    option2.value = "2400";
+    option2.text = "Midnight";
+    rDropdown.appendChild(option2);
   }
 
   // Call the function to populate the time dropdown
@@ -1050,6 +1059,11 @@
         return Math.round(Math.abs((firstDate.getTime() - secondDate.getTime())/(oneDay)));
     }
   $('#insertButton').click(function(){
+    //if date is empty alert and return without making the ajax call
+    if(document.getElementById("date").value === ""){
+        alert("Please enter a date");
+        return;
+    }
     $.ajax({
       contentType: "application/json",
       url: "http://nodejs-production-d97d.up.railway.app/insert",
