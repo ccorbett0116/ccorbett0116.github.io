@@ -73,14 +73,15 @@
       float: right;
       display: grid;
       grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
-      grid-template-rows: 1fr 0.5fr 0.7fr 1fr 1fr;
+      grid-template-rows: 1fr 0.5fr 0.7fr 1fr 1fr 1fr;
       gap: 0 0;
       grid-template-areas:
     "Recurring-Label Recurring-Label Recurring-Button . Description Description Description"
     "Sun Mon Tues Wed Thurs Fri Sat"
     "sunLabel monLabel tueLabel wedLabel thurLabel friLabel satLabel"
     "StartLabel Beginning-Date Beginning-Date . EndLabel Ending-Date Ending-Date"
-    "startTimeLabel startTime startTime . endTimeLabel endTime endTime";
+    "startTimeLabel startTime startTime . endTimeLabel endTime endTime"
+    ". . . insertRecButton . . .";
     }
     .Recurring-Label { grid-area: Recurring-Label; }
     .Recurring-Button { grid-area: Recurring-Button; }
@@ -107,7 +108,7 @@
     .startTime { grid-area: startTime; }
     .endTimeLabel { grid-area: endTimeLabel; }
     .endTime { grid-area: endTime; }
-
+    .insertRecButton { grid-area: insertRecButton; }
 
     .insert-section label {
       font-weight: bold;
@@ -142,7 +143,19 @@
       border-radius: 3px;
       cursor: pointer;
     }
+    .recurring-container button {
+      margin-top: 1em;
+      padding: 5px 10px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
     .insert-section button:hover {
+      background-color: #0056b3;
+    }
+    .recurring-container button:hover {
       background-color: #0056b3;
     }
 
@@ -756,6 +769,9 @@
     <div class="endTime fifteen shift">
         <select id="endTime2"></select>
     </div>
+    <div class="insertRecButton">
+      <button id="insertRecButton">Insert</button>
+    </div>
   </div>
 </div>
 </body>
@@ -883,6 +899,9 @@
   }
   document.getElementById("recurring").style.opacity = 1;
   document.getElementById("recurring").disabled = false;
+  document.getElementById("insertRecButton").disabled = true;
+  document.getElementById("insertRecButton").style.opacity = 0.5;
+  document.getElementById("insertRecButton").style.pointerEvents = "none";
 
 
   // Add an event listener to the recurringButton checkbox to handle enabling/disabling
@@ -897,10 +916,13 @@
     for (const element of insertSectionElements) {
       element.disabled = isEnabled;
       element.style.opacity = isEnabled ? 0.5 : 1; // Adjust opacity based on the checkbox state
-      document.getElementById("insertButton").disabled = isEnabled;
-      document.getElementById("insertButton").style.opacity = isEnabled ? 0.5 : 1;
-      document.getElementById("insertButton").style.pointerEvents = isEnabled ? "none" : "auto";
     }
+    document.getElementById("insertButton").disabled = isEnabled;
+    document.getElementById("insertButton").style.opacity = isEnabled ? 0.5 : 1;
+    document.getElementById("insertButton").style.pointerEvents = isEnabled ? "none" : "auto";
+    document.getElementById("insertRecButton").disabled = !isEnabled;
+    document.getElementById("insertRecButton").style.opacity = !isEnabled ? 0.5 : 1;
+    document.getElementById("insertRecButton").style.pointerEvents = !isEnabled ? "none" : "auto";
     document.getElementById("recurring").style.opacity = 1;
     document.getElementById("recurring").disabled = false;
   });
@@ -918,13 +940,7 @@
     const populatedElements = document.getElementsByClassName("populated");
     if (confirmDelete) {
       var eventToDeleteDescription = this.innerHTML;
-      var eventToDeleteDay=parseInt(this.classList[1].substring(3));
-      console.log(eventToDeleteDay + " is added");
-      //currentDay =
-      console.log(daysBetween(new Date)-1 + " is the current day")
-      eventToDeleteDay = daysBetween(new Date)-1 + eventToDeleteDay;
-      eventToDeleteDay = daysBetween(new Date)-1 + eventToDeleteDay;
-      console.log(eventToDeleteDay + " is the day");
+      var eventToDeleteDay=daysBetween(new Date)-1 +parseInt(this.classList[1].substring(3));
       var promises = [];
 
       for (let j = 0; j < populatedElements.length; j++) {
@@ -1064,6 +1080,11 @@
         alert("Please enter a date");
         return;
     }
+    //if end time is <= starttime alert and return without making the ajax call
+    if(document.getElementById("end").value <= document.getElementById("start").value){
+        alert("End time must be after start time");
+        return;
+    }
     $.ajax({
       contentType: "application/json",
       url: "http://nodejs-production-d97d.up.railway.app/insert",
@@ -1085,5 +1106,110 @@
       }
     });
   });
+    $('#insertRecButton').click(function (){
+      alert("insertRecButton clicked");
+      if(document.getElementById("start2").value === ""||document.getElementById("end2").value === ""){
+          alert("Please enter a starting and ending date");
+          return;
+      }
+      else if(document.getElementById("end2").value <= document.getElementById("start2").value){
+           alert("End date must be after start date");
+           return;
+      }
+      else if (document.getElementById("endTime2").value <= document.getElementById("startTime2").value){
+          alert("End time must be after start time");
+          return;
+      }
+        var days = [];
+        if(document.getElementById("sunday2").checked){
+            days.push(0);
+        }
+        if(document.getElementById("monday2").checked){
+            days.push(1);
+        }
+        if(document.getElementById("tuesday2").checked){
+            days.push(2);
+        }
+        if(document.getElementById("wednesday2").checked){
+            days.push(3);
+        }
+        if(document.getElementById("thursday2").checked){
+            days.push(4);
+        }
+        if(document.getElementById("friday2").checked){
+            days.push(5);
+        }
+        if(document.getElementById("saturday2").checked){
+            days.push(6);
+        }
+        if(days.length === 0){
+            alert("Please select at least one day of the week");
+            return;
+        }
+        var startRange = getDays(document.getElementById("start2").value);
+        var endRange = getDays(document.getElementById("end2").value);
+        var start = document.getElementById("startTime2").value;
+        var end = document.getElementById("endTime2").value;
+        var description = document.getElementById("description2").value;
+        var user;
+        //determine which day of the week the start date is
+      var daysToInsert = [];
+        for (var i=startRange; i<=endRange; i++) {
+          if (days.includes(i % 7)) {
+            daysToInsert.push(i);
+          }
+        }
+        console.log(daysToInsert) //working up to
+      //for (var i=0; i<daysToInsert.length; i++){}
+      $.ajax({
+        contentType: "application/json",
+        url: "http://nodejs-production-d97d.up.railway.app/insertRec",
+        type: 'POST',
+        data: JSON.stringify({
+          days : daysToInsert,
+          start : start,
+          end : end,
+          description : description,
+          user : "Cole"
+        }),
+        success: function(data){
+          alert(data.message)
+          onLoad();
+        },
+        error: function(err){
+          alert(err.message)
+          onLoad();
+        }
+      });
+    });
+  function testLogin(){
+    const password = "test123";
+    $.ajax({
+      contentType: "application/json",
+      url: "http://nodejs-production-d97d.up.railway.app/login",
+      type: 'GET',
+      data: { password: password }, // Send password as a query parameter
+      success: function(data){
+        //data is either "{user}" or "No password found" or "Error"(internal server error)
+        if(data === "No password found") {
+          alert("No user found or incorrect password!");
+        } else if (data === "Error") {
+          alert("Error");
+        } else {
+          alert("Logged in as " + data);
+        }
+        alert(data)
+        onLoad();
+      },
+      error: function(err){
+        alert(err)
+        onLoad();
+      }
+    });
+  }
+  //create a function to call getDays on January 1, 2023
+  function getDays2(date) {
+    console.log( getDays( new Date(2023,0,1)));
+  }
 </script>
 </html>
