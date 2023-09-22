@@ -819,6 +819,7 @@
       });
 
       var events = data.events;
+      console.log(events[1])
       //print all events returned
 
       if (events && Array.isArray(events)) {
@@ -867,6 +868,7 @@
         for (let i = 0; i < populatedElements.length; i++) {
           populatedElements[i].addEventListener("click", delete2);
         }
+
 
       } else {
         console.log("No events data received.");
@@ -1106,7 +1108,7 @@
       }
     });
   });
-    $('#insertRecButton').click(function (){
+  $('#insertRecButton').click(function (){
       alert("insertRecButton clicked");
       if(document.getElementById("start2").value === ""||document.getElementById("end2").value === ""){
           alert("Please enter a starting and ending date");
@@ -1121,6 +1123,7 @@
           return;
       }
         var days = [];
+        days.length = 0;
         if(document.getElementById("sunday2").checked){
             days.push(0);
         }
@@ -1154,13 +1157,13 @@
         var user;
         //determine which day of the week the start date is
       var daysToInsert = [];
+      daysToInsert.length=0;
         for (var i=startRange; i<=endRange; i++) {
           if (days.includes(i % 7)) {
             daysToInsert.push(i);
           }
         }
         console.log(daysToInsert) //working up to
-      //for (var i=0; i<daysToInsert.length; i++){}
       $.ajax({
         contentType: "application/json",
         url: "http://nodejs-production-d97d.up.railway.app/insertRec",
@@ -1173,7 +1176,16 @@
           user : "Cole"
         }),
         success: function(data){
-          alert(data.message)
+          console.log("The message is: "+data.message)
+          if(data.message == 0) {
+            alert("Successfully inserted all calendar events.")
+          }
+          else if(data.message == days.length){
+            alert("No calendar events were inserted. (Likely due to a timeslot overlap.)")
+          }
+          else {
+            alert("Successfully inserted " + days.length-data.message + " calendar events. (Failed insertions are likely due to a timeslot overlap.)")
+          }
           onLoad();
         },
         error: function(err){
