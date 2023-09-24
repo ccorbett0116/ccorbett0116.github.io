@@ -184,6 +184,11 @@
 <body>
 <div class="calendar-container">
   <div class="calendar">
+    <div style="display: flex; justify-content: center">
+      <a class="coleView" onclick="onLoad('Cole')">Cole View</a>
+      <a class="sharedView" style="padding-right: 1em; padding-left: 1em" onclick="onLoad('Shared')">Shared View</a>
+      <a class="twoView" onclick="onLoad('Two')" >Two View</a>
+    </div>
   <h1 class="title">24-Hour Weekly Calendar</h1>
   <table>
     <thead>
@@ -798,14 +803,23 @@
   }
 
   //Function to query database for events for a given day and the next 6 days
-  async function onLoad() {
+  async function onLoad(user) {
+    //start by clearing the table
+    var elements = document.getElementsByClassName("populated");
+    for (let i = 0; i<elements.length; i++) {
+      elements[i].removeEventListener("click", delete2);
+    }
+    for (let i = elements.length-1; i >= 0; i--) {
+      elements[i].innerHTML = "";
+      elements[i].style.backgroundColor = "";
+      elements[i].classList.remove("populated")
+    }
     try {
       // Calculate the start date and end date for the 7-day range
       let startDate = new Date().toLocaleString("en-US", {timeZone: "America/New_York"})
       startDate = startDate.substring(0, 10);
       startDate=daysBetween(startDate)
       let endDate = startDate+6;
-      console.log(startDate)
 
       const data = await $.ajax({
         contentType: "application/json",
@@ -814,12 +828,11 @@
         data: {
           startDate: startDate,
           endDate: endDate,
-          user: "Cole"
+          user: user
         }
       });
 
       var events = data.events;
-      console.log(events[1])
       //print all events returned
 
       if (events && Array.isArray(events)) {
@@ -877,18 +890,39 @@
       alert(err.message);
     }
   }
-  /*var password;
-  function passwordCheck() {
-      while (password !== "123") {
-        password = prompt("Please enter the password.");
-      }
-    document.getElementsByClassName("title")[0].style.color="blue";
 
-      * Run for loop for each date in week range grabbing all events of the day
-      * for each event returned, input into table
-      *
+  function passwordCheck() {
+    if(sessionStorage.getItem("user")!==null){
+        document.getElementsByClassName("title")[0].style.color="blue";
+        onLoad(sessionStorage.getItem("user"));
+        return;
+    }
+    var pass = prompt("Please enter the password.");
+    $.ajax({
+      contentType: "application/json",
+      url: "http://nodejs-production-d97d.up.railway.app/login",
+      type: 'GET',
+      data: { password: pass }, // Send password as a query parameter
+      success: function(data) {
+        if (data === "No password found") {
+          alert("No user found or incorrect password!");
+          passwordCheck(); // Prompt again if the password is incorrect
+        } else if (data === "Error") {
+          alert("Error");
+          passwordCheck(); // Prompt again in case of an error
+        } else {
+          sessionStorage.setItem("user", data); // Save the user in session storage
+          document.getElementsByClassName("title")[0].style.color="blue";
+          onLoad(sessionStorage.getItem("user"));
+        }
+      },
+      error: function(err) {
+        alert(err);
+        onLoad(sessionStorage.getItem("user"));
+      }
+    });
   }
-  window.onload=passwordCheck;*/
+  window.onload=passwordCheck;
   // Get a reference to the recurringButton checkbox and the elements in the recurring-container
   const recurringButton = document.getElementById("recurring");
   const recurringContainerElements = document.querySelectorAll(".recurring-container input, .recurring-container select");
@@ -961,11 +995,10 @@
               data: JSON.stringify({
                 time: eventToDeleteTime,
                 description: eventToDeleteDescription,
-                user: "Cole",
+                user: sessionStorage.getItem("user"),
                 date: eventToDeleteDay
               }),
               success: function (data) {
-                console.log(data);
                 resolve(data); // Resolve the promise on success
               },
               error: function (err) {
@@ -989,12 +1022,12 @@
                   toRemoveElements[i].classList.remove("populated");
                   toRemoveElements[i].classList.remove("toRemove");
                 }
-                onLoad();
+                onLoad(sessionStorage.getItem("user"));
               })
               .catch(function(err) {
                 // Handle errors here if needed
                 console.error(err);
-                onLoad();
+                onLoad(sessionStorage.getItem("user"));
               });
     }
   }
@@ -1096,20 +1129,19 @@
         start : document.getElementById("start").value,
         end : document.getElementById("end").value,
         description : document.getElementById("description").value,
-        user : "Cole"
+        user : sessionStorage.getItem("user")
       }),
       success: function(data){
         alert(data.message)
-        onLoad();
+        onLoad(sessionStorage.getItem("user"));
       },
       error: function(err){
         alert(err.message)
-        onLoad();
+        onLoad(sessionStorage.getItem("user"));
       }
     });
   });
   $('#insertRecButton').click(function (){
-      alert("insertRecButton clicked");
       if(document.getElementById("start2").value === ""||document.getElementById("end2").value === ""){
           alert("Please enter a starting and ending date");
           return;
@@ -1163,7 +1195,6 @@
             daysToInsert.push(i);
           }
         }
-        console.log(daysToInsert) //working up to
       $.ajax({
         contentType: "application/json",
         url: "http://nodejs-production-d97d.up.railway.app/insertRec",
@@ -1173,34 +1204,32 @@
           start : start,
           end : end,
           description : description,
-          user : "Cole"
+          user : sessionStorage.getItem("user")
         }),
         success: function(data){
-          console.log("The message is: "+data.message)
           if(data.message == 0) {
             alert("Successfully inserted all calendar events.")
           }
-          else if(data.message == days.length){
+          else if(data.message == daysToInsert.length){
             alert("No calendar events were inserted. (Likely due to a timeslot overlap.)")
           }
           else {
-            alert("Successfully inserted " + days.length-data.message + " calendar events. (Failed insertions are likely due to a timeslot overlap.)")
+            alert("Successfully inserted " + ((daysToInsert.length)-parseInt(data.message)) + " of " + daysToInsert.length + " calendar events. (Failed insertions are likely due to a timeslot overlap.)")
           }
-          onLoad();
+          onLoad(sessionStorage.getItem("user"));
         },
         error: function(err){
           alert(err.message)
-          onLoad();
+          onLoad(sessionStorage.getItem("user"));
         }
       });
     });
-  function testLogin(){
-    const password = "test123";
+  function login(pass){
     $.ajax({
       contentType: "application/json",
       url: "http://nodejs-production-d97d.up.railway.app/login",
       type: 'GET',
-      data: { password: password }, // Send password as a query parameter
+      data: { password: pass }, // Send password as a query parameter
       success: function(data){
         //data is either "{user}" or "No password found" or "Error"(internal server error)
         if(data === "No password found") {
@@ -1211,11 +1240,11 @@
           alert("Logged in as " + data);
         }
         alert(data)
-        onLoad();
+        onLoad(sessionStorage.getItem("user"));
       },
       error: function(err){
         alert(err)
-        onLoad();
+        onLoad(sessionStorage.getItem("user"));
       }
     });
   }
