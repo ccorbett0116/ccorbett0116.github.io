@@ -186,8 +186,8 @@
   <div class="calendar">
     <div style="display: flex; justify-content: center">
       <a class="coleView" onclick="onLoad('Cole')">Cole View</a>
-      <a class="sharedView" style="padding-right: 1em; padding-left: 1em" onclick="onLoad('Shared')">Shared View</a>
-      <a class="twoView" onclick="onLoad('Two')" >Two View</a>
+      <a class="sharedView" style="padding-right: 1em; padding-left: 1em" onclick="loadShared()">Shared View</a>
+      <a class="twoView" onclick="onLoad('Anna')" >Anna View</a>
     </div>
   <h1 class="title">24-Hour Weekly Calendar</h1>
   <table>
@@ -868,8 +868,16 @@
             var elements = document.getElementsByClassName(classString);
             for (let i = 0; i < elements.length; i++) {
               elements[i].innerHTML = event.description;
-              elements[i].style.backgroundColor = "blue";
               elements[i].classList.add("populated")
+              elements[i].style.backgroundColor = "#60d4fc";
+              elements[i].style.color = "white"
+              if(user==="Anna"){
+                elements[i].style.backgroundColor = "#ffe4f4";
+                elements[i].style.color = "black"
+              }
+              if(sessionStorage.getItem("user")===user){
+                elements[i].addEventListener("click", delete2);
+              }
             }
           });
         }
@@ -877,12 +885,6 @@
          * Create an alert with 2 options when a populated <td> element is clicked: options Confirm or Cancel
          * If Confirm is clicked, delete the event from the database and call onLoad() to refresh the table
          */
-        var populatedElements = document.getElementsByClassName("populated");
-        for (let i = 0; i < populatedElements.length; i++) {
-          populatedElements[i].addEventListener("click", delete2);
-        }
-
-
       } else {
         console.log("No events data received.");
       }
@@ -891,11 +893,126 @@
     }
   }
 
+  async function loadShared(){
+    //this function should be the same as onLoad() until it comes to handling the response
+    var elements = document.getElementsByClassName("populated");
+    for (let i = 0; i<elements.length; i++) {
+      elements[i].removeEventListener("click", delete2);
+    }
+    for (let i = elements.length-1; i >= 0; i--) {
+      elements[i].innerHTML = "";
+      elements[i].style.backgroundColor = "";
+      elements[i].classList.remove("populated")
+    }
+    try{
+      let startDate = new Date().toLocaleString("en-US", {timeZone: "America/New_York"})
+        startDate = startDate.substring(0, 10);
+        startDate=daysBetween(startDate)
+        let endDate = startDate+6;
+        const data = await $.ajax({
+          contentType: "application/json",
+          url: "http://nodejs-production-d97d.up.railway.app/getSharedEventsRange",
+          type: 'GET',
+          data: {
+            startDate: startDate,
+            endDate: endDate,
+          }
+        });
+        var events = data.events;
+        if (events&&Array.isArray(events)){
+          //print the date time and user of each event\
+          events.forEach(sharedEvent => {
+            console.log(sharedEvent.date + "    " + sharedEvent.time + "    " + sharedEvent.user + "    " + sharedEvent.description);
+          })
+          //Go through the events array, if an events date and time matches another event, change the description of both events to "COLLISION DETECTED"
+          for (let i = 0; i < events.length; i++) {
+            for (let j = i + 1; j < events.length; j++) {
+              if (events[i].date === events[j].date && events[i].time === events[j].time) {
+                events[i].description = "COLLISION DETECTED";
+                events[j].description = "COLLISION DETECTED";
+              }
+            }
+          }
+          //for all occasions where collisions are detected, keep the first one, and delete the next
+            for (let i = 0; i < events.length; i++) {
+                for (let j = i + 1; j < events.length; j++) {
+                if (events[i].date === events[j].date && events[i].time === events[j].time) {
+                    events.splice(j, 1);
+                }
+                }
+            }
+            console.log("After collision detection");
+          events.forEach(sharedEvent => {
+            console.log(sharedEvent.date + "    " + sharedEvent.time + "    " + sharedEvent.user + "    " + sharedEvent.description);
+            var day = sharedEvent.date - daysBetween(new Date) +1;
+            var user = sharedEvent.user;
+            var time = sharedEvent.time.toString();
+            var dayClass = "day" + day;
+            var timeClass;
+            if (time.length === 1) {
+              timeClass = "000" + time;
+            } else if (time.length === 2) {
+              timeClass = "00" + time;
+            } else if (time.length === 3) {
+              timeClass = "0" + time;
+            } else {
+              timeClass = time;
+            }
+            var classString = timeClass + " " + dayClass;
+            var elements = document.getElementsByClassName(classString);
+            console.log(elements.length)
+            console.log(classString)
+            console.log(sharedEvent)
+            for (let i = 0; i < elements.length; i++) {
+              if(sharedEvent.description==="COLLISION DETECTED"){
+                elements[i].innerHTML = "Placeholder Text";
+                elements[i].style.backgroundColor = "#84eb1a";
+                elements[i].classList.add("populated")
+                elements[i].style.color = "white";
+              }
+              else if(user==="Anna"){
+                elements[i].innerHTML = sharedEvent.description;
+                elements[i].style.backgroundColor = "#ffe4f4";
+                elements[i].classList.add("populated");
+                elements[i].style.color = "black"
+                if(sessionStorage.getItem("user")==="Anna"){
+                  //add event listener
+                  elements[i].addEventListener("click", delete2)
+                }
+              }
+              else{
+                elements[i].innerHTML = sharedEvent.description;
+                elements[i].style.backgroundColor = "#60d4fc";
+                elements[i].classList.add("populated");
+                elements[i].style.color = "white";
+                if(sessionStorage.getItem("user")===sharedEvent.user){
+                  elements[i].addEventListener("click", delete2)
+                }
+              }
+            }
+          })
+        }
+        else{
+          console.log("No events data received.");
+        }
+    }
+    catch (err) {
+      alert(err.message);
+    }
+  }
+
   function passwordCheck() {
     if(sessionStorage.getItem("user")!==null){
-        document.getElementsByClassName("title")[0].style.color="blue";
+      if(sessionStorage.getItem("user")==="Anna"){
+        document.getElementsByClassName("title")[0].style.color = "pink";
         onLoad(sessionStorage.getItem("user"));
         return;
+      }
+      else {
+        document.getElementsByClassName("title")[0].style.color = "blue";
+        onLoad(sessionStorage.getItem("user"));
+        return;
+      }
     }
     var pass = prompt("Please enter the password.");
     $.ajax({
@@ -1186,7 +1303,6 @@
         var start = document.getElementById("startTime2").value;
         var end = document.getElementById("endTime2").value;
         var description = document.getElementById("description2").value;
-        var user;
         //determine which day of the week the start date is
       var daysToInsert = [];
       daysToInsert.length=0;
@@ -1224,33 +1340,5 @@
         }
       });
     });
-  function login(pass){
-    $.ajax({
-      contentType: "application/json",
-      url: "http://nodejs-production-d97d.up.railway.app/login",
-      type: 'GET',
-      data: { password: pass }, // Send password as a query parameter
-      success: function(data){
-        //data is either "{user}" or "No password found" or "Error"(internal server error)
-        if(data === "No password found") {
-          alert("No user found or incorrect password!");
-        } else if (data === "Error") {
-          alert("Error");
-        } else {
-          alert("Logged in as " + data);
-        }
-        alert(data)
-        onLoad(sessionStorage.getItem("user"));
-      },
-      error: function(err){
-        alert(err)
-        onLoad(sessionStorage.getItem("user"));
-      }
-    });
-  }
-  //create a function to call getDays on January 1, 2023
-  function getDays2(date) {
-    console.log( getDays( new Date(2023,0,1)));
-  }
 </script>
 </html>
