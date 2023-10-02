@@ -789,7 +789,7 @@
 
   // Function to get the current date in the format "Sunday September 10"
   function getCurrentDate(offset) {
-    const now = new Date();
+    const now = new Date().toLocaleString("en-US", {timeZone: "America/New_York"});
     now.setDate(now.getDate() + offset); // Adjust for each day of the week
     const dayOfWeek = daysOfWeek[now.getDay()];
     const month = months[now.getMonth()];
@@ -848,7 +848,7 @@
           });
 
           eventsForCurrentDay.forEach(event => {
-            var day = event.date - daysBetween(new Date) +1; //I HAVE NO FUCKING CLUE WHY BUT DO NOT TOUCH THIS +1
+            var day = event.date - daysBetween(new Date().toLocaleString("en-US", {timeZone: "America/New_York"})) +1; //I HAVE NO FUCKING CLUE WHY BUT DO NOT TOUCH THIS +1
             var user = event.user;
             var time = event.time.toString();
             var dayClass = "day" + day;
@@ -944,7 +944,7 @@
             console.log("After collision detection");
           events.forEach(sharedEvent => {
             console.log(sharedEvent.date + "    " + sharedEvent.time + "    " + sharedEvent.user + "    " + sharedEvent.description);
-            var day = sharedEvent.date - daysBetween(new Date) +1;
+            var day = sharedEvent.date - daysBetween(new Date().toLocaleString("en-US", {timeZone: "America/New_York"})) +1;
             var user = sharedEvent.user;
             var time = sharedEvent.time.toString();
             var dayClass = "day" + day;
@@ -1086,7 +1086,7 @@
   function daysBetween(date) {
     var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
     var firstDate = new Date(2023,0,1);
-    var secondDate = new Date(date);
+    var secondDate = new Date(date).toLocaleString("en-US", {timeZone: "America/New_York"});
     return Math.round(Math.abs((secondDate.getTime() - firstDate.getTime())/(oneDay)));
   }
   function delete2() {
@@ -1094,7 +1094,7 @@
     const populatedElements = document.getElementsByClassName("populated");
     if (confirmDelete) {
       var eventToDeleteDescription = this.innerHTML;
-      var eventToDeleteDay=daysBetween(new Date)-1 +parseInt(this.classList[1].substring(3));
+      var eventToDeleteDay=daysBetween(new Date().toLocaleString("en-US", {timeZone: "America/New_York"}))-1 +parseInt(this.classList[1].substring(3));
       var promises = [];
 
       for (let j = 0; j < populatedElements.length; j++) {
@@ -1223,8 +1223,8 @@
 //create function to return the number of days between a January 1, 2023 and a date
     function getDays(date) {
         var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
-        var firstDate = new Date(2023,0,1);
-        var secondDate = new Date(date);
+        var firstDate = new Date(2023,0,1).toLocaleString("en-US", {timeZone: "America/New_York"});
+        var secondDate = new Date(date).toLocaleString("en-US", {timeZone: "America/New_York"});
         return Math.round(Math.abs((firstDate.getTime() - secondDate.getTime())/(oneDay)));
     }
   $('#insertButton').click(function(){
