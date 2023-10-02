@@ -789,7 +789,7 @@
 
   // Function to get the current date in the format "Sunday September 10"
   function getCurrentDate(offset) {
-    const now = new Date().toLocaleString("en-US", {timeZone: "America/New_York"});
+    const now = new Date();
     now.setDate(now.getDate() + offset); // Adjust for each day of the week
     const dayOfWeek = daysOfWeek[now.getDay()];
     const month = months[now.getMonth()];
@@ -1086,7 +1086,7 @@
   function daysBetween(date) {
     var oneDay = 24*60*60*1000; // hours*minutes*seconds*milliseconds
     var firstDate = new Date(2023,0,1);
-    var secondDate = new Date(date).toLocaleString("en-US", {timeZone: "America/New_York"});
+    var secondDate = new Date(date);
     return Math.round(Math.abs((secondDate.getTime() - firstDate.getTime())/(oneDay)));
   }
   function delete2() {
