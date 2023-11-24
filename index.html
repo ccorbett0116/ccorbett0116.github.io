@@ -68,6 +68,10 @@
         <p>Welcome to my personal website! I'm a computer science student with a passion for coding and problem-solving.</p>
         <p>Generated using GPT-3</p>
     </div>
+    <textarea id="promptInput" placeholder="Enter your prompt here"></textarea>
+    <button onclick="processString()">Process String</button>
+
+    <div id="responseContainer"></div>
 </div>
 <div class="footer">
     <div class="container">
@@ -78,6 +82,31 @@
 </div>
 </body>
 <script>
+    async function processString() {
+            try {
+                const promptInput = document.getElementById('promptInput').value;
+                
+                const response = await fetch('http://tunnel.poligpt.ca:8000/process_string', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        prompt: promptInput
+                    })
+                });
+
+                const responseData = await response.json();
+                displayResponse(responseData.response);
+            } catch (error) {
+                console.error('Error processing string:', error);
+            }
+        }
+
+        function displayResponse(response) {
+            const responseContainer = document.getElementById('responseContainer');
+            responseContainer.innerHTML = `<p>${response}</p>`;
+        }
     function  makeCall(){
         $.ajax({
             url: "http://nodejs-production-d97d.up.railway.app",
