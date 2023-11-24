@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Example</title>
+</head>
+<body>
+
+    <textarea id="promptInput" placeholder="Enter your prompt here"></textarea>
+    <button onclick="processString()">Process String</button>
+
+    <div id="responseContainer"></div>
+
+    <script>
+        async function processString() {
+            try {
+                const promptInput = document.getElementById('promptInput').value;
+                
+                const response = await fetch('http://tunnel.poligpt.ca:8000/process_string', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        prompt: promptInput
+                    })
+                });
+
+                const responseData = await response.json();
+                displayResponse(responseData.response);
+            } catch (error) {
+                console.error('Error processing string:', error);
+            }
+        }
+
+        function displayResponse(response) {
+            const responseContainer = document.getElementById('responseContainer');
+            responseContainer.innerHTML = `<p>${response}</p>`;
+        }
+    </script>
+
+</body>
+</html>
